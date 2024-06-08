@@ -51,7 +51,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public List<BoardResponseDto> findBoardAll() {
-        return boardRepository.findAll().stream().map(BoardResponseDto::of).collect(Collectors.toList());
+        return boardRepository.findAllByOrderByCreatedAtDesc().stream().map(BoardResponseDto::of).collect(Collectors.toList());
     }
 
     @Override
