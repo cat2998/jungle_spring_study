@@ -8,10 +8,8 @@ import lombok.NoArgsConstructor;
 import study.board.dto.Board.BoardUpdateRequestDto;
 
 @Getter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
-@Entity
+@Entity(name = "TB_BOARD")
 public class Board extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,6 +24,11 @@ public class Board extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public Board(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 
     public void update(BoardUpdateRequestDto boardDto) {
         this.title = boardDto.title();
