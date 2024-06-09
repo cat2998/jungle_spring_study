@@ -7,9 +7,6 @@ public record BoardRequestDto(
         String content
 ) {
     public Board toEntity() {
-        return Board.builder()
-                .title(this.title)
-                .content(this.content)
-                .build();
+        return new Board(this.title, this.content);
     }
 }
