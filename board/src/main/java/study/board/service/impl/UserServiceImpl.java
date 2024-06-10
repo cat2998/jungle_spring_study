@@ -2,6 +2,7 @@ package study.board.service.impl;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import study.board.domain.User;
@@ -19,11 +20,13 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, JwtUtil jwtUtil) {
+    public UserServiceImpl(UserRepository userRepository, JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -33,6 +36,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new ApiException(ErrorCode.USERNAME_ALREADY_EXISTS);
         }
+        user.passwordEncode(passwordEncoder);
         user.updateUserRole(UserRole.USER);
         userRepository.save(user);
     }
@@ -41,7 +45,7 @@ public class UserServiceImpl implements UserService {
     public void loginUser(UserRequestDto userDto, HttpServletResponse response) {
         User user = userDto.toEntity();
         userRepository.findByUsername(user.getUsername())
-                .filter(u -> u.getPassword().equals(user.getPassword()))
+                .filter(u-> passwordEncoder.matches(user.getPassword(), u.getPassword()))
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_LONGIN_ERROR));
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(), user.getRole()));
     }
