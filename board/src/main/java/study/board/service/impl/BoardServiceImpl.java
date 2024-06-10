@@ -38,6 +38,10 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public BoardResponseDto saveBoard(BoardRequestDto boardDto, HttpServletRequest httpServletRequest) {
+        if (!jwtUtil.validateToken(jwtUtil.resolveToken(httpServletRequest))) {
+            throw new ApiException(ErrorCode.TOKEN_INVALID);
+        }
+
         String username = getCurrentUsername(httpServletRequest);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ApiException(ErrorCode.USERNAME_NOT_FOUND));
@@ -50,14 +54,16 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public BoardResponseDto updateBoard(Long id, BoardUpdateRequestDto boardDto, HttpServletRequest httpServletRequest) {
-        validateToken(httpServletRequest);
+        if (!jwtUtil.validateToken(jwtUtil.resolveToken(httpServletRequest))) {
+            throw new ApiException(ErrorCode.TOKEN_INVALID);
+        }
 
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.BOARD_NOT_FOUND));
 
         String username = getCurrentUsername(httpServletRequest);
-        if (!board.getUser().getUsername().equals(username)) {
-            throw new ApiException(ErrorCode.ACCESS_INVALID);
+        if (board.getUser().getRole().equals(UserRole.USER) && !board.getUser().getUsername().equals(username)) {
+            throw new ApiException(ErrorCode.USERNAME_INVALID);
         }
 
         board.update(boardDto);
@@ -67,14 +73,16 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public void deleteBoard(Long id, HttpServletRequest httpServletRequest) {
-        validateToken(httpServletRequest);
+        if (!jwtUtil.validateToken(jwtUtil.resolveToken(httpServletRequest))) {
+            throw new ApiException(ErrorCode.TOKEN_INVALID);
+        }
 
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.BOARD_NOT_FOUND));
 
         String username = getCurrentUsername(httpServletRequest);
-        if (!board.getUser().getUsername().equals(username)) {
-            throw new ApiException(ErrorCode.ACCESS_INVALID);
+        if (board.getUser().getRole().equals(UserRole.USER) && !board.getUser().getUsername().equals(username)) {
+            throw new ApiException(ErrorCode.USERNAME_INVALID);
         }
 
         boardRepository.deleteById(id);
@@ -94,12 +102,5 @@ public class BoardServiceImpl implements BoardService {
 
     private String getCurrentUsername(HttpServletRequest httpServletRequest) {
         return jwtUtil.getUserInfoFromToken(jwtUtil.resolveToken(httpServletRequest)).getSubject();
-    }
-
-    // 토큰 검증
-    private void validateToken(HttpServletRequest httpServletRequest) {
-        if (!jwtUtil.validateToken(jwtUtil.resolveToken(httpServletRequest))) {
-            throw new ApiException(ErrorCode.TOKEN_INVALID);
-        }
     }
 }
