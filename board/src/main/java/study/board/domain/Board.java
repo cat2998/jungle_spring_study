@@ -34,4 +34,8 @@ public class Board extends Timestamped {
         this.title = boardDto.title();
         this.content = boardDto.content();
     }
+
+    public void updateUser(User user) {
+        this.user = user;
+    }
 }
