@@ -1,31 +1,40 @@
 package study.board.exception;
 
-import jdk.jshell.spi.ExecutionControl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import study.board.dto.ApiResponse;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler
-    public void ApiExceptionHandler(ApiException e) {
-        throw new ApiException(e.getErrorCode());
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ApiResponse<Void>> ApiExceptionHandler(ApiException e) {
+        ApiResponse<Void> response = new ApiResponse<>(e.getErrorCode().getHttpStatus().toString(), null, e.getMessage());
+        return new ResponseEntity<>(response, e.getErrorCode().getHttpStatus());
     }
 
-//    @ExceptionHandler(ApiException.class)
-//    public ResponseEntity<ApiResponse<ErrorCode>> ApiExceptionHandler(ApiException e) {
-//        ApiException apiException = new ApiException(e.getErrorCode());
-//        return ResponseEntity.status(201).body(new ApiResponse<>("api_error", apiException, "Board created successfully"));
-//        return new ResponseEntity<>(apiException, HttpStatus.BAD_REQUEST);
-//    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Map<String, String>>> MethodArgumentNotValidExceptionHandler (MethodArgumentNotValidException e) {
+        Map<String, String> errors = new HashMap<>();
+        e.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(HttpStatus.BAD_REQUEST.toString(), errors, "join fail"));
+    }
 
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ExceptionHandler
-//    public ErrorCode exHandler(Exception e) {
-//        return new ErrorCode(HttpStatus.INTERNAL_SERVER_ERROR, "내부 오류!");
-//    }
+    @ExceptionHandler
+    public ResponseEntity<ApiResponse<Void>> ExHandler(Exception e) {
+        ApiResponse<Void> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.toString(), null, "내부 오류!");
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
