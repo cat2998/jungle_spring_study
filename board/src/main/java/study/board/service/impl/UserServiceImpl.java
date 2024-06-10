@@ -13,6 +13,7 @@ import study.board.jwt.JwtUtil;
 import study.board.repository.UserRepository;
 import study.board.service.UserService;
 
+@Transactional(readOnly = true)
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -37,7 +38,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public void loginUser(UserRequestDto userDto, HttpServletResponse response) {
         User user = userDto.toEntity();
         userRepository.findByUsername(user.getUsername())

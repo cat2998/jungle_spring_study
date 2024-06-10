@@ -40,7 +40,6 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<Void>> login(@RequestBody UserRequestDto userDto, HttpServletResponse response) {
         userService.loginUser(userDto, response);
-        //성공시 todo
         return ResponseEntity.ok(new ApiResponse<>(null, null, "Login successfully"));
     }
 }
