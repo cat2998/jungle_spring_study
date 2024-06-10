@@ -1,8 +1,6 @@
 package study.board.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import study.board.dto.Board.BoardUpdateRequestDto;
