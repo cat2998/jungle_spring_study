@@ -11,7 +11,8 @@ public enum ErrorCode {
     USERNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST,"이미 존재하는 username입니다."),
 //    TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST,"잘못된 접근 입니다."),
 //    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED,"토큰이 만료되었습니다."),
-//    TOKEN_INVALID(HttpStatus.UNAUTHORIZED,"유효하지 않은 토큰입니다."),
+    TOKEN_INVALID(HttpStatus.UNAUTHORIZED,"유효하지 않은 토큰입니다."),
+    ACCESS_INVALID(HttpStatus.BAD_REQUEST,"유효하지 않은 접근입니다."),
 //    STOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주식이 존재하지 않습니다."),
 //    NEWS_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 뉴스가 존재하지 않습니다."),
 //    CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 채팅방이 존재하지 않습니다."),
@@ -23,6 +24,7 @@ public enum ErrorCode {
 //    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 username을 찾을 수 없습니다."),
 
     USER_LONGIN_ERROR(HttpStatus.BAD_REQUEST,"username 또는 비밀번호가 올바르지 않습니다."),
+    USERNAME_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 username을 찾을 수 없습니다."),
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 게시물을 찾을 수 없습니다.");
 
     private HttpStatus httpStatus;
